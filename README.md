@@ -11,13 +11,23 @@ Repositório contendo exemplos de projetos simples utilizando [Docker](https://w
 
 O Objetivo é mostrar as diversas configurações do **Dockerfile** facilitando o seu uso.
 
-[exemplo-1-streamlit](./exemplo1-python-streamlit)
+[exemplo1-python-streamlit](./exemplo1-python-streamlit)
 
 Executa um app em Python utilizando Streamlit:
 
 ```sh
-cd exemplo1-streamlit
+cd exemplo1-pytyhon-streamlit
 docker build --tag image1 .
 docker run -p 8501:8501 --name container1 image1
+```
+
+[exemplo2-python-fastapi](./exemplo2-python-fastapi)
+
+Executa um app em Python utilizando FastAPI e Gunicorn:
+
+```sh
+cd exemplo2-python-fastapi
+docker build --tag image2 .
+docker run -p 8000:8000 --name container2 image2
 ```
 
