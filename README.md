@@ -8,7 +8,7 @@
 
 Este repositório contém vários exemplos de projetos simples utilizando [Docker](https://www.docker.com/). O Objetivo é mostrar as diversas configurações de **Dockerfile** exemplificando o seu uso.
 
-## 1. [exemplo1-python-streamlit](./exemplo1-python-streamlit) App em Python/Streamlit
+## 1. [App em Python/Streamlit 🗁](./exemplo1-python-streamlit)
 
 Para executá-lo, inicie o container
 ```sh
@@ -19,7 +19,7 @@ docker run -p 8501:8501 --name container1 image1
 e abra o navegador em http://localhost:8501
 
 
-## 2. [exemplo2-python-fastapi](./exemplo2-python-fastapi) API em Python/FastAPI/Gunicorn
+## 2. [API em Python/FastAPI/Gunicorn 🗁](./exemplo2-python-fastapi)
 
 ```sh
 cd exemplo2-python-fastapi
@@ -32,7 +32,7 @@ curl -X GET http://localhost:8000/produtos
 ```
 
 
-## 3. [exemplo3-postgres](./exemplo3-postgres) Instância do Postgres DB
+## 3. [Instância do Postgres DB 🗁](./exemplo3-postgres)
 
 Para executá-lo, inicie o container, execute o script para criação dos objetos de banco e verifique o conteúdo de uma das tabelas
 ```sh
