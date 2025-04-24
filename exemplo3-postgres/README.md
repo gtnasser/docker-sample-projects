@@ -64,7 +64,7 @@ Database| datawarehouse
 
 Vamos executar o backup para poder restaurá-lo em outra instância
 ```sh
-PS C:\Users\gtnas\Downloads\docker-sample-projects\exemplo3-postgres> docker exec -t postgres-dados pg_dump -U analista -d datawarehouse > backup.sql
+PS C:\Users\gtnas\Downloads\docker-sample-projects\exemplo3-postgres> docker exec -t container3 pg_dump -U analista -d datawarehouse > backup.sql
 ```
 
 # 3. Executar uma nova instância
@@ -72,12 +72,12 @@ PS C:\Users\gtnas\Downloads\docker-sample-projects\exemplo3-postgres> docker exe
 Executar um novo container mas agora definindo um volume para persistir os dados. A montagem de volume (```-v postgres_data_novo:/var/lib/postgresql/data```) cria um volume do Docker chamado *postgres_data_novo* que mantém os arquivos de banco de dados fora do contêiner. Isso garante que seus dados não sejam perdidos quando o contêiner parar ou for removido.
 
 ```sh
-docker run --name postgres-dados-novo -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v postgres_data_novo:/var/lib/postgresql/data -p 5433:5432 -d postgres:14.8
+docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -p 5433:5432 -d postgres:14.8 -v postgres_data_novo:/var/lib/postgresql/data
 ```
 
 restaurar os dados
 ```sh
-cat backup.sql | docker exec -i postgres-dados-novo psql -U analista -d datawarehouse
+cat backup.sql | docker exec -i container3-b psql -U analista -d datawarehouse
 
 SET
 SET
@@ -112,7 +112,7 @@ ALTER TABLE
 
 vamos verificar o conteúdo da tabela *vendas*
 ```sh
-echo "select * from vendas;" | docker exec -i postgres-dados psql -U analista -d datawarehouse
+echo "select * from vendas;" | docker exec -i container3 psql -U analista -d datawarehouse
 
  id | data_venda |     produto      | categoria  |  valor  | quantidade
 ----+------------+------------------+------------+---------+------------
@@ -124,25 +124,16 @@ echo "select * from vendas;" | docker exec -i postgres-dados psql -U analista -d
 (5 rows)
 ```
 
-agora vamos parar as duas instâncias e reiniciá-las.
+agora vamos remover esse conteiner e reiniciá-lo. A expectativa é acessar os dados persistidos no voluma externo anexado ao container.
 
 ```sh
-# listar contâineres em execução
-docker ps -a
+docker stop container3-b
+docker rm container3-b
+docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -p 5433:5432 -d postgres:14.8 -v postgres_data_novo:/var/lib/postgresql/data
 
-CONTAINER ID   IMAGE           COMMAND                  CREATED          STATUS                   PORTS                    NAMES
-c19e3d942d9b   postgres:14.8   "docker-entrypoint.s…"   9 minutes ago    Up 9 minutes             0.0.0.0:5433->5432/tcp   postgres-dados-novo
-636de3d9ca07   postgres:14.8   "docker-entrypoint.s…"   35 minutes ago   Up 35 minutes            0.0.0.0:5432->5432/tcp   postgres-dados
+# validar a persistência dos dados
 
-# parar o contâiner novo e recriar utilizando o mesmo voluma
-
-docker stop postgres-dados-novo
-docker rm postgres-dados-novo
-docker run --name postgres-dados-novo -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v postgres_data_novo:/var/lib/postgresql/data -p 5433:5432 -d postgres:14.8
-
-# executar a consulta na base persistida
-
-echo "select * from vendas;" | docker exec -i postgres-dados-novo psql -U analista -d datawarehouse
+echo "select * from vendas;" | docker exec -i container3-b psql -U analista -d datawarehouse
  id | data_venda |     produto      | categoria  |  valor  | quantidade
 ----+------------+------------------+------------+---------+------------
   1 | 2025-01-15 | Curso Python     | Educa????o |  197.00 |         45

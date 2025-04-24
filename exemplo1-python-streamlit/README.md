@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ```sh
 streamlit run app.py
 ```
-e abir o navegador em http://localhost:8501
+e abrir o navegador em http://localhost:8501
 
 
 ## 2. Executando API no Docker
@@ -68,6 +68,9 @@ CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0"]
 2.2 criar a imagem e executar o container
 ```sh
 docker build --tag image1 .
-docker run -p 8501:8501 --name container1 server1
+docker run -p 8501:8501 --name container1 image1
 ```
+e abrir o navegador em http://localhost:8501
+
+
 
