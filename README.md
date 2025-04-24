@@ -6,28 +6,39 @@
 
 </div>
 
+Este repositório contém vários exemplos de projetos simples utilizando [Docker](https://www.docker.com/). O Objetivo é mostrar as diversas configurações de **Dockerfile** exemplificando o seu uso.
 
-Repositório contendo exemplos de projetos simples utilizando [Docker](https://www.docker.com/).
+## 1. [exemplo1-python-streamlit](./exemplo1-python-streamlit) App em Python/Streamlit
 
-O Objetivo é mostrar as diversas configurações do **Dockerfile** facilitando o seu uso.
-
-[exemplo1-python-streamlit](./exemplo1-python-streamlit)
-
-Executa um app em Python utilizando Streamlit:
-
+Para executá-lo, inicie o container
 ```sh
 cd exemplo1-pytyhon-streamlit
 docker build --tag image1 .
 docker run -p 8501:8501 --name container1 image1
 ```
+e abra o navegador em http://localhost:8501
 
-[exemplo2-python-fastapi](./exemplo2-python-fastapi)
 
-Executa um app em Python utilizando FastAPI e Gunicorn:
+## 2. [exemplo2-python-fastapi](./exemplo2-python-fastapi) API em Python/FastAPI/Gunicorn
 
 ```sh
 cd exemplo2-python-fastapi
 docker build --tag image2 .
 docker run -p 8000:8000 --name container2 image2
+```
+e execute a chamada
+```sh
+curl -X GET http://localhost:8000/produtos
+```
+
+
+## 3. [exemplo3-postgres](./exemplo3-postgres) Instância do Postgres DB
+
+Para executá-lo, inicie o container, execute o script para criação dos objetos de banco e verifique o conteúdo de uma das tabelas
+```sh
+cd exemplo3-postgres
+docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v container3-vol:/var/lib/postgresql/data -p 5433:5432 -d postgres:14.8
+cat backup.sql | docker exec -i container3-b psql -U analista -d datawarehouse
+echo "select * from vendas;" | docker exec -i container3 psql -U analista -d datawarehouse
 ```
 

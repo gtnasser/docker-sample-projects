@@ -7,13 +7,13 @@ Vamos mostrar como manter a persistência dos dados
 
 Executar o container baseado em uma imagem oficial do Postgres, passando as definições de nome da instância, usuário e senha pelas variáveis de ambiente.
 ```sh
-docker run --name postgres-dados -e POSTGRES_DB=datawarehouse -e POSTGRES_USER=analista -e POSTGRES_PASSWORD=segredo -p 5432:5432 -d postgres:14.8
+docker run --name container3 -e POSTGRES_DB=datawarehouse -e POSTGRES_USER=analista -e POSTGRES_PASSWORD=segredo -p 5432:5432 -d postgres:14.8
 ```
 
 executar o cliente psql dentro do contêiner para criar a tabela *vendas* e inserir alguns registros
 
 ```sh
-docker exec -it postgres-dados psql -U analista -d datawarehouse
+docker exec -it container3 psql -U analista -d datawarehouse
 
 psql (14.8 (Debian 14.8-1.pgdg120+1))
 Type "help" for help.
@@ -64,7 +64,7 @@ Database| datawarehouse
 
 Vamos executar o backup para poder restaurá-lo em outra instância
 ```sh
-PS C:\Users\gtnas\Downloads\docker-sample-projects\exemplo3-postgres> docker exec -t container3 pg_dump -U analista -d datawarehouse > backup.sql
+docker exec -t container3 pg_dump -U analista -d datawarehouse > backup.sql
 ```
 
 # 3. Executar uma nova instância
@@ -72,7 +72,7 @@ PS C:\Users\gtnas\Downloads\docker-sample-projects\exemplo3-postgres> docker exe
 Executar um novo container mas agora definindo um volume para persistir os dados. A montagem de volume (```-v postgres_data_novo:/var/lib/postgresql/data```) cria um volume do Docker chamado *postgres_data_novo* que mantém os arquivos de banco de dados fora do contêiner. Isso garante que seus dados não sejam perdidos quando o contêiner parar ou for removido.
 
 ```sh
-docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -p 5433:5432 -d postgres:14.8 -v postgres_data_novo:/var/lib/postgresql/data
+docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v container3-vol:/var/lib/postgresql/data -p 5433:5432 -d postgres:14.8
 ```
 
 restaurar os dados
@@ -129,7 +129,7 @@ agora vamos remover esse conteiner e reiniciá-lo. A expectativa é acessar os d
 ```sh
 docker stop container3-b
 docker rm container3-b
-docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -p 5433:5432 -d postgres:14.8 -v postgres_data_novo:/var/lib/postgresql/data
+docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v container3-vol:/var/lib/postgresql/data -p 5433:5432 -d postgres:14.8
 
 # validar a persistência dos dados
 
