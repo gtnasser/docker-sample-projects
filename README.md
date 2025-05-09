@@ -21,6 +21,7 @@ e abra o navegador em http://localhost:8501
 
 ## 2. [API em Python/FastAPI/Gunicorn 🗁](./exemplo2-python-fastapi)
 
+Para executá-lo, inicie o container
 ```sh
 cd exemplo2-python-fastapi
 docker build --tag image2 .
@@ -34,7 +35,7 @@ curl -X GET http://localhost:8000/produtos
 
 ## 3. [Instância do Postgres DB 🗁](./exemplo3-postgres)
 
-Para executá-lo, inicie o container, execute o script para criação dos objetos de banco e verifique o conteúdo de uma das tabelas
+Para executá-lo, inicie o container, execute o script para criação dos objetos de banco e verifique o conteúdo da tabela *vendas*
 ```sh
 cd exemplo3-postgres
 docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v container3-vol:/var/lib/postgresql/data -p 5433:5432 -d postgres:14.8
@@ -42,3 +43,53 @@ cat backup.sql | docker exec -i container3-b psql -U analista -d datawarehouse
 echo "select * from vendas;" | docker exec -i container3 psql -U analista -d datawarehouse
 ```
 
+## 4. [Fullstack com front-end em Python/Streamlit e back-end em FastAPI/Postgres 🗁](./exemplo4-fastapi-streamlit-postgres)
+
+Para executá-lo, inicie o container
+```sh
+docker compose up
+```
+em seguida abra o navegador em ```http://localhost:8501```
+
+Para acessar o banco de dados, utilizar as credenciais
+
+Parâmetro|Valor
+---|---
+Driver| Postgres
+Host| localhost
+Port| 5432
+User| analista
+Password| segredo
+Database| datawarehouse
+
+Para acessar a API execute no terminal
+```sh
+curl -X GET http://localhost:8000/docs
+```
+
+
+
+
+
+
+
+Para executar somente o banco de dados, crie a imagem e inicie o container. Em seguida execute o script para criação dos objetos de banco e verifique o conteúdo da tabela *vendas*
+
+```sh
+cd 4-fastapi-streamlit-postgres/pg
+docker run --name container4-pg -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v volume4:/var/lib/postgresql/data -p 5434:5432 -d postgres:14.8
+cat backup.sql | docker exec -i container4-db psql -U analista -d datawarehouse
+```
+
+Para executar a API:
+```sh
+cd exemplo4-postgres-fastapi-streamlit/api
+docker build --tag image4-api .
+docker run -p 8004:8000 --name container4-api image4-api
+```
+e execute a chamada
+```sh
+curl -X GET http://localhost:8000/produtos
+```
+
+ docker compose -f 'exemplo4-postgres-fastapi-streamlit\docker-compose.yml' up -d --build
