@@ -1,0 +1,47 @@
+# docker-compose.yml
+services:
+  # Banco de dados
+  db:
+    image: postgres:14.8
+    container_name: container4-db
+    environment:
+      - POSTGRES_USER=analista
+      - POSTGRES_PASSWORD=segredo
+      - POSTGRES_DB=datawarehouse
+    volumes:
+      - volume4-db:/var/lib/postgresql/data
+      # executa script na criacao do banco
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U analista -d datawarehouse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API para acesso aos dados
+  api:
+    build: ./api
+    container_name: container4-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://analista:segredo@db:5432/datawarehouse
+    ports:
+      - "8000:8000"
+
+  # Dashboard para visualização
+  dashboard:
+    build: ./dashboard
+    container_name: container4-frontend
+    depends_on:
+      - api
+    environment:
+      - API_URL=http://api:8000
+    ports:
+      - "8501:8501"
+
+volumes:
+  volume4-db:
