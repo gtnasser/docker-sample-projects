@@ -6,13 +6,14 @@
 
 </div>
 
-Este repositório contém vários exemplos de projetos simples utilizando [Docker](https://www.docker.com/). O Objetivo é mostrar as diversas configurações de **Dockerfile** exemplificando o seu uso.
+Este repositório contém vários exemplos de projetos simples utilizando [Docker](https://www.docker.com/). O Objetivo é mostrar as diversas configurações de **Dockerfile** exemplificando o seu uso. Clicando no título de cada projeto voce terá acesso aos detalhes de configuração, funcionalidades, e o passo a passo de execução.
+
 
 ## 1. [App em Python/Streamlit 🗁](./exemplo1-python-streamlit)
 
-Para executá-lo, inicie o container
+Este exemplo é um dashboard desenvolvido em Streamlit. Para executá-lo, inicie o container
 ```sh
-cd exemplo1-pytyhon-streamlit
+cd exemplo1-python-streamlit
 docker build --tag image1 .
 docker run -p 8501:8501 --name container1 image1
 ```
@@ -21,13 +22,13 @@ e abra o navegador em http://localhost:8501
 
 ## 2. [API em Python/FastAPI/Gunicorn 🗁](./exemplo2-python-fastapi)
 
-Para executá-lo, inicie o container
+Este exemplo é uma API servindo dados de venda de produtos. Para executá-lo, inicie o container
 ```sh
 cd exemplo2-python-fastapi
 docker build --tag image2 .
 docker run -p 8000:8000 --name container2 image2
 ```
-e execute a chamada
+e execute a chamada para retornar dados dos produtos
 ```sh
 curl -X GET http://localhost:8000/produtos
 ```
@@ -35,7 +36,7 @@ curl -X GET http://localhost:8000/produtos
 
 ## 3. [Instância do Postgres DB 🗁](./exemplo3-postgres)
 
-Para executá-lo, inicie o container, execute o script para criação dos objetos de banco e verifique o conteúdo da tabela *vendas*
+Este exemplo é um banco de dados em Postgres com persistência dos dados. Para executá-lo, inicie o container, execute o script para criação dos objetos de banco e verifique o conteúdo da tabela *vendas*
 ```sh
 cd exemplo3-postgres
 docker run --name container3-b -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v container3-vol:/var/lib/postgresql/data -p 5433:5432 -d postgres:14.8
@@ -43,53 +44,22 @@ cat backup.sql | docker exec -i container3-b psql -U analista -d datawarehouse
 echo "select * from vendas;" | docker exec -i container3 psql -U analista -d datawarehouse
 ```
 
+
 ## 4. [Fullstack com front-end em Python/Streamlit e back-end em FastAPI/Postgres 🗁](./exemplo4-fastapi-streamlit-postgres)
 
-Para executá-lo, inicie o container
+Inicie os 3 serviços (backend, frontend e storage)
 ```sh
-docker compose up
+docker compose up -d
 ```
-em seguida abra o navegador em ```http://localhost:8501```
+e abra o navegador em ```http://localhost:8501```
 
-Para acessar o banco de dados, utilizar as credenciais
 
-Parâmetro|Valor
----|---
-Driver| Postgres
-Host| localhost
-Port| 5432
-User| analista
-Password| segredo
-Database| datawarehouse
-
-Para acessar a API execute no terminal
+Para encerrar os serviços removendo os containeres mas mantendo o volume com os dados, execute no terminal
 ```sh
-curl -X GET http://localhost:8000/docs
+docker compose down
 ```
 
-
-
-
-
-
-
-Para executar somente o banco de dados, crie a imagem e inicie o container. Em seguida execute o script para criação dos objetos de banco e verifique o conteúdo da tabela *vendas*
-
+Para encerrar os serviços removendo também o volume, execute no terminal
 ```sh
-cd 4-fastapi-streamlit-postgres/pg
-docker run --name container4-pg -e POSTGRES_PASSWORD=segredo -e POSTGRES_USER=analista -e POSTGRES_DB=datawarehouse -v volume4:/var/lib/postgresql/data -p 5434:5432 -d postgres:14.8
-cat backup.sql | docker exec -i container4-db psql -U analista -d datawarehouse
+docker compose down -v
 ```
-
-Para executar a API:
-```sh
-cd exemplo4-postgres-fastapi-streamlit/api
-docker build --tag image4-api .
-docker run -p 8004:8000 --name container4-api image4-api
-```
-e execute a chamada
-```sh
-curl -X GET http://localhost:8000/produtos
-```
-
- docker compose -f 'exemplo4-postgres-fastapi-streamlit\docker-compose.yml' up -d --build
