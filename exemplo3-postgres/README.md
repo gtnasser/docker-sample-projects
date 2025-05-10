@@ -67,7 +67,7 @@ Executar o backup para poder restaurá-lo em outra instância
 docker exec -t container3 pg_dump -U analista -d datawarehouse > backup.sql
 ```
 
-# 3. Executar uma nova instância anexndo um volume
+# 3. Executar uma nova instância anexando um volume
 
 Executar um novo conteiner mas agora definindo um volume para persistir os dados. A montagem de volume (```-v postgres_data_novo:/var/lib/postgresql/data```) cria um volume do Docker chamado *postgres_data_novo* que mantém os arquivos de banco de dados fora do conteiner. Isso garante que seus dados não sejam perdidos quando o conteiner parar ou for removido.
 
