@@ -1,0 +1,13 @@
+services:
+  oracle-db:
+    image: oracleinanutshell/oracle-xe-11g:latest
+    container_name: oracle11g
+    ports:
+      - 1521:1521
+      - 8080:8080
+      - 5500:5500
+    environment:
+      - ORACLE_ALLOW_REMOTE=true
+    volumes:
+      # executa script na criacao do banco
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
